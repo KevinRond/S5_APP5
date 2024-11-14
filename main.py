@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 import statistics as stat
+import scipy.special
 
 def get_values(file_path):
     with open(file_path, 'r') as file:
@@ -130,8 +131,10 @@ def mandat_3():
     N = 10_000
     arrival_rate = 5
     mean = 1/arrival_rate
-    x = np.linspace(0, 10_000, 5)
-    P = arrival_rate * np.exp(-arrival_rate * x)
+    x = np.linspace(0, 5, 1000)
+    P = (arrival_rate**x * np.exp(-arrival_rate * x))/scipy.special.factorial(x) # mauvaise formule
+
+    print(math.factorial(5))
 
     plt.plot(x, P)
     plt.show()
