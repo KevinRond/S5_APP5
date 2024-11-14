@@ -17,13 +17,13 @@ def get_desc_stats(data):
     max = np.max(data)
 
     return {
-        'Moyenne': mean,
-        'Médiane': median,
-        'Mode': mode,
-        'Écart-type': std,
-        'Variance': var,
-        'Minimum': min,
-        'Maximum': max
+        'mean': mean,
+        'med': median,
+        'mode': mode,
+        'std': std,
+        'var': var,
+        'min': min,
+        'max': max
     }
 
 
@@ -74,7 +74,6 @@ def get_histogram_data(data):
     min_value = np.min(data)
     max_value = np.max(data)
     interval_len = (max_value - min_value) / bin_number
-    interval_len = math.ceil(interval_len)
 
     bins = []
     cumul_freq = 0
@@ -107,11 +106,37 @@ def display_histogram(binwidth, data):
     plt.savefig("histogramme", bbox_inches='tight', dpi=300)
     plt.show()
 
+def calculate_confidence_interval(data):
+    z = 1.96
+    mean = stat.mean(data)
+    std = stat.stdev(data)
 
-if __name__ == '__main__':
+    error = z * std / np.sqrt(len(data))
+    lower_interval = mean - error
+    upper_interval = mean + error
+
+    return lower_interval, upper_interval
+
+def mandat_2():
     values = get_values("./TempsDeJeu.txt")
     stats = get_desc_stats(values)
-    display_stats_table(stats)
-    bins, interval_len = get_histogram_data(values)
-    display_histogram(interval_len, values)
-    display_histogram_table(bins)
+    # display_stats_table(stats)
+    # bins, interval_len = get_histogram_data(values)
+    # display_histogram(interval_len, values)
+    # display_histogram_table(bins)
+    print(calculate_confidence_interval(values))
+
+def mandat_3():
+    N = 10_000
+    arrival_rate = 5
+    mean = 1/arrival_rate
+    x = np.linspace(0, 10_000, 5)
+    P = arrival_rate * np.exp(-arrival_rate * x)
+
+    plt.plot(x, P)
+    plt.show()
+
+
+if __name__ == '__main__':
+    # mandat_2()
+    mandat_3()
