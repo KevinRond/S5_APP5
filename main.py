@@ -34,8 +34,19 @@ def display_stats_table(stats):
     ax.axis('tight')
     ax.axis('off')
 
-    # Create a table with the statistics data
-    table_data = [[key, f"{value:.2f}"] for key, value in stats.items()]
+    labels = ["Moyenne", "Médiane", "Mode", "Écart-type", "Variance", "Minimum", "Maximum"]
+    values = [
+        stats['mean'],
+        stats['med'],
+        stats['mode'],
+        stats['std'],
+        stats['var'],
+        stats['min'],
+        stats['max']
+    ]
+
+    # Create a table with the custom labels and values
+    table_data = [[label, f"{value:.2f}"] for label, value in zip(labels, values)]
     table = ax.table(cellText=table_data, colLabels=["Statistique descriptive", "Valeur"], cellLoc="center", loc="center")
     table.scale(1, 2)
 
@@ -189,9 +200,9 @@ def get_adjustment_data(bins, mean, std):
 def mandat_2():
     values = get_values("./TempsDeJeu.txt")
     data_stats = get_desc_stats(values)
-    # display_stats_table(data_stats)
+    display_stats_table(data_stats)
     bins, interval_len = get_histogram_data(values)
-    # display_histogram(interval_len, values)
+    display_histogram(interval_len, values)
     display_histogram_table(bins)
     adjustement_data = get_adjustment_data(bins, data_stats['mean'], data_stats['std'])
     display_adjustment_table(adjustement_data)
