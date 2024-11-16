@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import math
 import statistics as stat
 import scipy.special
+import scipy.stats as stats
 
 def get_values(file_path):
     with open(file_path, 'r') as file:
@@ -50,7 +51,7 @@ def display_histogram_table(bins):
     table_data = [
         [
             bin['class'],
-            bin['limits'],
+            f"[{bin['lower_limit']:.1f} - {bin['upper_limit']:.1f}[",
             f"{bin['centre']:.2f}",
             bin['freq'],
             f"{bin['rel_freq'] * 100:.2f}%",
@@ -62,12 +63,42 @@ def display_histogram_table(bins):
     # Create a table with bin data
     table = ax.table(
         cellText=table_data,
-        colLabels=["Classe", "Limite", "Centre", "Fréquence", "Fréquence relative", "Fréquence cumulative"],
+        colLabels=["Classe", "Limites", "Centre", "Fréquence", "Fréquence relative", "Fréquence cumulative"],
         cellLoc="center", loc="center"
     )
     table.scale(1, 1.5)
 
     plt.savefig("table_histogramme", bbox_inches='tight', dpi=300)
+    plt.show()
+
+def display_adjustment_table(adjustment_data):
+    fig, ax = plt.subplots()
+    ax.axis('tight')
+    ax.axis('off')
+
+    table_data = [
+        [
+            bin['class'],
+            f"[{bin['lower_limit']:.1f} - {bin['upper_limit']:.1f}[",
+            f"{bin['lower_limit_z']:.2f}",
+            f"{bin['upper_limit_z']:.2f}",
+            f"{bin['pi']:.2f}",
+            bin['oi'],
+            f"{bin['ei']:.2f}",
+            f"{bin['wtf']:.2f}",
+        ]
+        for bin in adjustment_data
+    ]
+
+    # Create a table with bin data
+    table = ax.table(
+        cellText=table_data,
+        colLabels=["Classe", "Limites", "Borne Gauche Z", "Borne Droite Z", "Pi", "Oi", "Ei", "(Oi-Ei)**2 / Ei"],
+        cellLoc="center", loc="center"
+    )
+    table.scale(1, 1.5)
+
+    plt.savefig("table_ajustement", bbox_inches='tight', dpi=300)
     plt.show()
 
 def get_histogram_data(data):
@@ -88,7 +119,8 @@ def get_histogram_data(data):
         cumul_freq += rel_freq
         bins.append({
             'class': i+1,
-            'limits': f'{lower_limit} - {upper_limit}',
+            'lower_limit': lower_limit,
+            'upper_limit': upper_limit,
             'centre': centre,
             'freq': frequency,
             'rel_freq': rel_freq,
@@ -118,14 +150,52 @@ def calculate_confidence_interval(data):
 
     return lower_interval, upper_interval
 
+def get_adjustment_data(bins, mean, std):
+    adjustement_data = []
+
+    for bin in bins:
+        lower_limit_z = (bin['lower_limit'] - mean) / std
+        upper_limit_z = (bin['upper_limit'] - mean) / std
+        pi = stats.norm.cdf(upper_limit_z) - stats.norm.cdf(lower_limit_z)
+        oi = bin['freq']
+        ei = oi * pi
+        wtf_is_that = (oi - ei)**2 / ei
+        adjustement_data.append({
+            'class': bin['class'],
+            'lower_limit': bin['lower_limit'],
+            'upper_limit': bin['upper_limit'],
+            'lower_limit_z': lower_limit_z,
+            'upper_limit_z': upper_limit_z,
+            'pi': pi,
+            'oi': oi,
+            'ei': ei,
+            'wtf': wtf_is_that
+        })
+
+    x = 0
+    for bin in adjustement_data:
+        x += bin['wtf']
+
+    other_x = 14.07
+
+    if x > other_x:
+        print(f"Les données ne proviennent pas d'une distribution normale")
+    else:
+        print(f"Les données proviennent d'une distribution normale")
+
+    return adjustement_data
+
+
 def mandat_2():
     values = get_values("./TempsDeJeu.txt")
-    stats = get_desc_stats(values)
-    # display_stats_table(stats)
-    # bins, interval_len = get_histogram_data(values)
+    data_stats = get_desc_stats(values)
+    # display_stats_table(data_stats)
+    bins, interval_len = get_histogram_data(values)
     # display_histogram(interval_len, values)
-    # display_histogram_table(bins)
-    print(calculate_confidence_interval(values))
+    display_histogram_table(bins)
+    adjustement_data = get_adjustment_data(bins, data_stats['mean'], data_stats['std'])
+    display_adjustment_table(adjustement_data)
+    # print(calculate_confidence_interval(values))
 
 def mandat_3():
     N = 10_000
@@ -141,5 +211,5 @@ def mandat_3():
 
 
 if __name__ == '__main__':
-    # mandat_2()
-    mandat_3()
+    mandat_2()
+    # mandat_3()
