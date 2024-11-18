@@ -246,7 +246,7 @@ def mandat_3():
     Q_inv = np.array([inverse_F(u) for u in U]) * std + mean
 
     plt.hist(Q_inv, bins=100, alpha=0.7, edgecolor='black')
-    plt.title('Courbe de la valeur Q')
+    plt.title('Distribution des valeurs de Q')
     plt.xlabel('Temps total joué par un joueur (min)')
     plt.ylabel('Fréquence')
     plt.savefig("courbe_normale", bbox_inches='tight', dpi=300)
@@ -259,7 +259,7 @@ def mandat_3():
         plt.figure(figsize=(12, 12))
         plt.subplot(2, 1, 1)
         plt.hist(P_inv, bins=100, alpha=0.7, edgecolor='black')
-        plt.title(f'Courbe de la valeur P (λ = {lam})')
+        plt.title(f'Distribution des valeurs de P (λ = {lam})')
         plt.xlabel('Temps entre chaque arrivé (min)')
         plt.ylabel('Fréquence')
 
